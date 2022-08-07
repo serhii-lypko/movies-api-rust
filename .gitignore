@@ -1,0 +1,10 @@
+Cargo.lock
+target
+.env*
+
+.DS_Store
+.vscode
+docker/postgres-data
+.idea
+
+*dump*
