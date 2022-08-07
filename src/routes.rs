@@ -27,5 +27,9 @@ pub async fn create_movie(
 pub async fn get_movies(database: Data<DatabasePool>) -> Result<HttpResponse, ApiError> {
     let movies: Vec<Movie> = database.list()?;
 
+    let first_movie = &movies[0];
+
+    println!("{}", first_movie);
+
     Ok(HttpResponse::Ok().json(movies))
 }

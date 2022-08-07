@@ -1,5 +1,5 @@
 table! {
-    movie (id) {
+    movies (id) {
         id -> Uuid,
         title -> Varchar,
         director -> Varchar,

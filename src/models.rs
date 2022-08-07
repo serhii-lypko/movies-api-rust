@@ -1,4 +1,6 @@
-use crate::schema::movie;
+use std::fmt;
+
+use crate::schema::movies;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -10,15 +12,21 @@ use crate::db::DatabasePool;
 /* --- --- --- --- --- --- --- --- --- --- --- --- --- --- */
 
 #[derive(Serialize, Deserialize, Queryable, Insertable, Debug, Clone)]
-#[table_name = "movie"]
+#[table_name = "movies"]
 pub struct Movie {
     pub id: Uuid,
     pub title: String,
     pub director: String,
 }
 
-#[derive(Serialize, Deserialize, Queryable, AsChangeset)]
-#[table_name = "movie"]
+impl fmt::Display for Movie {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "(Title: {}, Director: {})", self.title, self.director)
+    }
+}
+
+#[derive(Serialize, Deserialize, AsChangeset)]
+#[table_name = "movies"]
 pub struct NewMovie {
     pub title: String,
     pub director: String,
@@ -41,13 +49,13 @@ pub trait Crud<I> {
 
 impl Crud<Movie> for DatabasePool {
     fn list(&self) -> Result<Vec<Movie>, ApiError> {
-        let movies = movie::table.load::<Movie>(&self.get().unwrap())?;
+        let movies = movies::table.load::<Movie>(&self.get().unwrap())?;
 
         Ok(movies)
     }
 
     fn insert(&self, item: Movie) -> Result<Movie, ApiError> {
-        let movie: Movie = diesel::insert_into(movie::table)
+        let movie: Movie = diesel::insert_into(movies::table)
             .values(item)
             // TODO: how to avoid having unwrap()
             .get_result(&self.get().unwrap())?;
