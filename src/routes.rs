@@ -1,5 +1,7 @@
-use actix_web::web::{Data, Json};
-use actix_web::{HttpResponse, Result};
+use actix_web::web::{Data, Json, Path};
+use actix_web::{delete, get, post, put};
+use actix_web::{HttpResponse, Responder, Result};
+use uuid::Uuid;
 
 use crate::api_error::ApiError;
 use crate::db::DatabasePool;
@@ -7,6 +9,18 @@ use crate::models::{Crud, Movie, NewMovie};
 
 /* --- --- --- --- --- --- --- --- --- --- --- --- --- --- */
 
+#[get("/movies")]
+pub async fn get_movies(database: Data<DatabasePool>) -> Result<HttpResponse, ApiError> {
+    let movies: Vec<Movie> = database.list()?;
+
+    // let first_movie = &movies[0];
+
+    // println!("{}", first_movie);
+
+    Ok(HttpResponse::Ok().json(movies))
+}
+
+#[post("/movie")]
 pub async fn create_movie(
     movie_json: Json<NewMovie>,
     database: Data<DatabasePool>,
@@ -24,12 +38,10 @@ pub async fn create_movie(
     Ok(HttpResponse::Ok().json(saved_movie))
 }
 
-pub async fn get_movies(database: Data<DatabasePool>) -> Result<HttpResponse, ApiError> {
-    let movies: Vec<Movie> = database.list()?;
+#[delete("/movie/{id}")]
+pub async fn delete_movie(id: Path<Uuid>, database: Data<DatabasePool>) -> impl Responder {
+    // TODO: how database service knows about exact model?
+    database.delete(id.into_inner()).unwrap();
 
-    let first_movie = &movies[0];
-
-    println!("{}", first_movie);
-
-    Ok(HttpResponse::Ok().json(movies))
+    HttpResponse::Ok()
 }

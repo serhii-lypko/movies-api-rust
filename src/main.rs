@@ -14,7 +14,7 @@ mod routes;
 mod schema;
 
 use crate::db::create_connection_pool;
-use crate::routes::{create_movie, get_movies};
+use crate::routes::{create_movie, delete_movie, get_movies};
 
 /* --- --- --- --- --- --- --- --- --- --- --- --- --- --- */
 
@@ -24,8 +24,9 @@ async fn ok() -> HttpResponse {
 }
 
 fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(web::resource("/movies").route(web::get().to(get_movies)));
-    cfg.service(web::resource("/create-movie").route(web::post().to(create_movie)));
+    cfg.service(get_movies);
+    cfg.service(create_movie);
+    cfg.service(delete_movie);
 }
 
 #[actix_web::main]
